@@ -1,0 +1,56 @@
+#!/usr/bin/zsh
+
+REGEX='Accepted (passowrd|publickey) for \S+ from (\d{1,3}\.){3}\d{1,3} port \d{1,5}'
+
+check-envs() {
+    for i in TG_TOKEN TG_USER SYSTEMD_DAEMON; do
+        if [[ ! -v $i ]]; then
+            echo "Environment variable $i unset"
+            exit 1
+        fi
+    done
+}
+
+API_URL="https://api.telegram.org/bot$TG_TOKEN/sendMessage"
+
+send-message-to-telegram() {
+    local message=$1
+
+    local answer=$(curl -sS \
+        --data-urlencode "chat_id=$TG_USER" \
+        --data-urlencode "text=$message" \
+        --data-urlencode 'parse_mode=MarkdownV2' \
+        $API_URL)
+
+    if [[ $(jq -r '.ok' <<<$answer) = 'true' ]]; then
+        echo 'Message send'
+    else
+        echo "Error $answer"
+    fi
+}
+
+main() {
+    check-envs
+
+    journalctl -u $SYSTEMD_DAEMON -f -n 0 --output cat | grep --line-buffered -Po $REGEX | while read line; do
+        local line_splited=(${(@s: :)line})
+        
+        local type_auth=${line_splited[2]}
+        local username=${line_splited[4]}
+        local ip=${line_splited[6]}
+        local port=${line_splited[8]}
+
+        local text="New connection SSH
+
+*Host:* \`$(hostname)\`
+*From:* \`${ip:gs/\./\\\.}:$port\`
+*User:* \`$username\`
+*Method:* \`$type_auth\`
+
+_${$(date '+%H:%M %d.%m.%Y'):gs/\./\\\.}_
+"
+        send-message-to-telegram $text
+    done
+}
+
+main

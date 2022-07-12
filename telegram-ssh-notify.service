@@ -1,0 +1,12 @@
+[Unit]
+Description=Notification about SSH connection in telegram
+After=ssh.service
+
+[Service]
+EnvironmentFile=/etc/telegram-ssh-notify.env
+
+ExecStart=/usr/local/lib/telegram-ssh-notify
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
