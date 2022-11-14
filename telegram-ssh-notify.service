@@ -1,6 +1,6 @@
 [Unit]
 Description=Notification about SSH connection in telegram
-After=ssh.service
+Before=ssh.service
 
 [Service]
 EnvironmentFile=/etc/telegram-ssh-notify.env
