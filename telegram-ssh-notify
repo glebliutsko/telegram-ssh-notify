@@ -3,7 +3,7 @@
 REGEX='Accepted (password|publickey) for \S+ from (\d{1,3}\.){3}\d{1,3} port \d{1,5}'
 
 check-envs() {
-    for i in TG_TOKEN TG_USER SYSTEMD_DAEMON; do
+    for i in TG_TOKEN TG_CHAT SYSTEMD_DAEMON; do
         if [[ ! -v $i ]]; then
             echo "Environment variable $i unset"
             exit 1
@@ -16,11 +16,16 @@ API_URL="https://api.telegram.org/bot$TG_TOKEN/sendMessage"
 send-message-to-telegram() {
     local message=$1
 
-    local answer=$(curl -sS \
-        --data-urlencode "chat_id=$TG_USER" \
-        --data-urlencode "text=$message" \
-        --data-urlencode 'parse_mode=MarkdownV2' \
-        $API_URL)
+    local params=()
+
+    params+=('--data-urlencode' "chat_id=$TG_CHAT")
+    params+=('--data-urlencode' "text=$message")
+    params+=('--data-urlencode' "parse_mode=MarkdownV2")
+    if [[ -n TG_THREAD ]]; then
+        params+=('--data-urlencode' "message_thread_id=$TG_THREAD")
+    fi
+
+    local answer=$(curl -sS ${params[@]} $API_URL)
 
     if [[ $(jq -r '.ok' <<<$answer) = 'true' ]]; then
         echo 'Message send'

@@ -24,6 +24,11 @@ sudo systemctl enable --now telegram-ssh-notify.service
 После отредактируйте файл /etc/telegram-ssh-notify.env, вставив туда нужные значения.
 
 ## Переменные окружения
+> [!NOTE]
+> Получить ID чата и темы можно при помощи бота [@jsonson_bot](https://t.me/jsonson_bot).
+> Его необходимо добавить в нужный чат и отправить команды `/json@jsonson_bot`
+
 - `TG_TOKEN` - API-токен телеграмма (Получить можно у [@BotFather](https://t.me/BotFather)).
-- `TG_USER` - ID вашего пользователя.
+- `TG_CHAT` - ID чата, куда отправляем оповещение
+- `TG_THREAD` - ID темы, куда отправляем оповещение
 - `SYSTEMD_DAEMON` - Назваение SSH-сервиса.
