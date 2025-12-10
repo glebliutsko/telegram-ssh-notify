@@ -21,7 +21,7 @@ send-message-to-telegram() {
     params+=('--data-urlencode' "chat_id=$TG_CHAT")
     params+=('--data-urlencode' "text=$message")
     params+=('--data-urlencode' "parse_mode=MarkdownV2")
-    if [[ -n TG_THREAD ]]; then
+    if [[ -v TG_THREAD ]]; then
         params+=('--data-urlencode' "message_thread_id=$TG_THREAD")
     fi
 
