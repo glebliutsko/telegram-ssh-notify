@@ -1,8 +1,36 @@
 [Unit]
 Description=Notification about SSH connection in telegram
-Before=ssh.service
+After=systemd-journald.service
+Before=sshd.service
 
 [Service]
+Nice=-10
+
+User=tgnotify
+DynamicUser=true
+SupplementaryGroups=systemd-journal
+
+ProtectSystem=strict
+PrivateTmp=true
+MemoryDenyWriteExecute=true
+ProtectKernelModules=true
+PrivateDevices=true
+PrivatePIDs=true
+ProtectHome=true
+ProtectClock=true
+ProtectKernelLogs=true
+ProtectHostname=true
+
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+SocketBindDeny=any
+DevicePolicy=closed
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
 EnvironmentFile=/etc/telegram-ssh-notify.env
 
 ExecStart=/usr/local/lib/telegram-ssh-notify
