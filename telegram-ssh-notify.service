@@ -1,7 +1,7 @@
 [Unit]
 Description=Notification about SSH connection in telegram
 After=systemd-journald.service
-Before=ssh.service
+Before=ssh.service sshd.service
 
 [Service]
 Nice=-10
